@@ -21,6 +21,7 @@ import {
   LinkIcon,
   ForwardIcon,
   QuotesIcon,
+  SmileyPlusIcon,
 } from "../../shared/design-system/icons";
 import { behindActiveOverlay } from "../../shared/design-system/overlayLayer";
 import { IconButton } from "../../shared/design-system/ui/IconButton";
@@ -82,6 +83,8 @@ type Props = {
   menuTriggerRef?: RefObject<HTMLButtonElement | null>;
   onSendToChannel?: (() => void) | undefined;
   onReply?: (() => void) | undefined;
+  /** Opens the reaction picker, as the toolbar's Add reaction does. */
+  onReact?: (() => void) | undefined;
   onForward?: (() => void) | undefined;
   replyDisabled?: boolean | undefined;
   link?: string | undefined;
@@ -193,6 +196,7 @@ function MessageActionBarControls({
   withToolbar,
   onSendToChannel,
   onReply,
+  onReact,
   onForward,
   replyDisabled,
   link,
@@ -313,15 +317,26 @@ function MessageActionBarControls({
       data-message-id={messageId}
       // The shared popup preserves moved focus; retirement also revokes
       // return-focus ownership, including a retained hidden source row.
-      finalFocus={() =>
-        live.current && !handingOffFocus
-          ? children
-            ? contextFocus.current?.isConnected
-              ? contextFocus.current
-              : false
-            : !openedByPointer
-          : false
-      }
+      finalFocus={() => {
+        if (!live.current || handingOffFocus) return false;
+        if (!children) return !openedByPointer;
+        const target = contextFocus.current;
+        if (!target?.isConnected) return false;
+        // Base UI refines a landing to its first tabbable descendant, which
+        // would move a selected message's focus to its author. Unless the
+        // close moved focus elsewhere, the message takes it back itself.
+        const active = target.ownerDocument.activeElement;
+        if (target.matches("[data-message-id] > [data-layout]")) {
+          if (
+            !active ||
+            active === target.ownerDocument.body ||
+            active.closest(".buzz-menu-popup")
+          )
+            target.focus({ preventScroll: true });
+          return false;
+        }
+        return target;
+      }}
     >
       <AfterMenuClose.Provider
         value={(action) => {
@@ -410,8 +425,24 @@ function MessageActionBarControls({
             Send to channel
           </MenuItem>
         )}
+        {children && onReact && (
+          // The same key as the message's own React shortcut.
+          <MenuItem
+            letter="r"
+            onClick={() => {
+              setHandingOffFocus(true);
+              afterClose.current = onReact;
+            }}
+          >
+            <MenuIcon>
+              <SmileyPlusIcon />
+            </MenuIcon>
+            Add reaction
+          </MenuItem>
+        )}
         {children && onReply && (
           <MenuItem
+            letter="t"
             disabled={replyDisabled}
             onClick={() => {
               setHandingOffFocus(true);

@@ -35,6 +35,7 @@ import { RemoteAgentHint, RemoteWorkIcon } from "./RemoteAgentHint";
 import { messagePreviewText } from "../conversation/message-preview-text";
 import { profileMentionParts } from "./profile-mentions";
 import { addressedMessage } from "./audience-address";
+import { openReactionPicker } from "./message-selection";
 import { WorkflowByline } from "./WorkflowByline";
 import { threadWorkingAgents } from "../agents/thread-working";
 import { TypingDots } from "../../shared/design-system/ui/TypingDots";
@@ -1250,6 +1251,11 @@ function MessageRowContent({
       menuTriggerRef={menuTrigger}
       messageId={row.id}
       onForward={forward ? () => forward(row) : undefined}
+      onReact={
+        canReact && !quickControls
+          ? () => void openReactionPicker(rowRef.current)
+          : undefined
+      }
       onReply={
         (onReply ? () => onReply(row.id) : undefined) ??
         (onOpenThread && startsThreads

@@ -161,6 +161,27 @@ export function reactionTrigger(element: HTMLElement) {
   );
 }
 
+const nextFrame = () =>
+  new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+/**
+ * Opens the reaction picker of the message holding `element`. Selecting it
+ * mounts its action bar, so the picker's trigger gets a few frames.
+ */
+export async function openReactionPicker(element: Element | null | undefined) {
+  const row = element?.closest<HTMLElement>(ROW);
+  if (!row) return;
+  if (selectedMessage()?.element !== row) selectMessage(row);
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const trigger = reactionTrigger(row);
+    if (trigger) {
+      trigger.click();
+      return;
+    }
+    await nextFrame();
+  }
+}
+
 /** The selected row's own Reply control, which opens or answers its thread. */
 export function replyTrigger(element: HTMLElement) {
   return Array.from(
@@ -187,7 +208,16 @@ export function moveMessageSelection(event: KeyboardEvent<HTMLElement>) {
   )
     return;
   const selected = selectedMessage();
-  if (!selected || !event.currentTarget.contains(selected.element)) return;
+  if (
+    !selected ||
+    !event.currentTarget.contains(selected.element) ||
+    // Only the message's own keys: a menu's Escape can arrive after the menu
+    // has already returned focus to the message.
+    event.target !== focusTarget(selected.element) ||
+    // A menu it opened owns the keys, even before focus moves into it.
+    focusTarget(selected.element).hasAttribute("data-menu-origin")
+  )
+    return;
   const owner = listFor(selected.element);
   if (!owner) return;
   if (event.key === "Escape") {
