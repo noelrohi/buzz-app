@@ -52,11 +52,17 @@ test("an agent's HTML page runs sandboxed inline and follows the theme; a person
     .route("https://example.com/**", (route) =>
       route.fulfill({ contentType: "text/html", body: "ok" }),
     );
-  const tab = browser.context().waitForEvent("page");
+  const confirm = agent.getByRole("group", { name: "Open link" });
+  // The page asked on load; nothing opened, and the viewer can still decline.
+  await expect(confirm).toContainText("https://example.com/unprompted");
   await frame.getByRole("link", { name: "Next" }).click();
+  await expect(confirm).toContainText("https://example.com/next");
+  const tab = browser.context().waitForEvent("page");
+  await confirm.getByRole("button", { name: "Open" }).click();
   await expect
     .poll(async () => (await tab).url())
     .toBe("https://example.com/next");
+  await expect(confirm).toHaveCount(0);
   expect(opened).not.toContain("https://example.com/unprompted");
 
   await browser

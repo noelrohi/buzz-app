@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Button } from "../../shared/design-system/ui/Button";
 import {
   clampHeight,
   HTML_RENDER_DEFAULT_HEIGHT,
@@ -51,8 +52,8 @@ export function HtmlRenderFrame({
   const [height, setHeight] = useState(
     () => measured.get(cacheKey) ?? HTML_RENDER_DEFAULT_HEIGHT,
   );
-  const openLink = useRef(onOpenLink);
-  openLink.current = onOpenLink;
+  // A link the page asked to open, waiting for the viewer to confirm it.
+  const [link, setLink] = useState<string | null>(null);
   const fail = useRef(onError);
   fail.current = onError;
 
@@ -80,16 +81,10 @@ export function HtmlRenderFrame({
         setHeight(next);
         return;
       }
-      // The page can send this unprompted. Only a click in it both focuses
-      // its frame and activates the host; activation alone can come from a
-      // click anywhere in the app moments before.
+      // The page can ask unprompted, and nothing it does proves a click, so
+      // the viewer confirms with a control the page can't reach.
       const url = readOpenLink(event.data);
-      if (
-        url &&
-        document.activeElement === frame.current &&
-        navigator.userActivation?.isActive
-      )
-        openLink.current(url);
+      if (url) setLink(url);
     };
     window.addEventListener("message", receive);
     return () => window.removeEventListener("message", receive);
@@ -108,21 +103,44 @@ export function HtmlRenderFrame({
   );
 
   return (
-    <div
-      ref={box}
-      className={styles.frame}
-      style={{ height }}
-      data-html-render=""
-    >
-      {source && (
-        <iframe
-          ref={frame}
-          title={title}
-          // Never allow-same-origin: the page must stay an opaque origin.
-          sandbox="allow-scripts allow-forms"
-          referrerPolicy="no-referrer"
-          {...source}
-        />
+    <div className={styles.page}>
+      <div
+        ref={box}
+        className={styles.frame}
+        style={{ height }}
+        data-html-render=""
+      >
+        {source && (
+          <iframe
+            ref={frame}
+            title={title}
+            // Never allow-same-origin: the page must stay an opaque origin.
+            sandbox="allow-scripts allow-forms"
+            referrerPolicy="no-referrer"
+            {...source}
+          />
+        )}
+      </div>
+      {link && (
+        // biome-ignore lint/a11y/useSemanticElements: a status line with its actions, not a form.
+        <div className={styles.link} role="group" aria-label="Open link">
+          <span className={styles.linkUrl} title={link}>
+            Open {link}?
+          </span>
+          <Button
+            size="sm"
+            variant="subtle"
+            onClick={() => {
+              setLink(null);
+              onOpenLink(link);
+            }}
+          >
+            Open
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setLink(null)}>
+            Cancel
+          </Button>
+        </div>
       )}
     </div>
   );

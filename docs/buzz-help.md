@@ -134,10 +134,10 @@ if that desktop app is up and running.
   **Download** again. A card that opens in the optional File viewer instead
   has its own download button, which saves another copy each time.
 - **HTML pages.** Agents show charts, diagrams and mockups inline with the
-  `html_render` tool. A page runs sandboxed and can't read Buzz; its links
-  open in your browser. An `.html` file a person posts stays a file card until
-  you choose **Show page**. Other apps show the page as a file. Turn this off
-  under **Settings → Plugins → HTML Pages**.
+  `html_render` tool. A page runs sandboxed and can't read Buzz; a link it
+  opens asks you first, then opens in your browser. An `.html` file a person
+  posts stays a file card until you choose **Show page**. Other apps show the
+  page as a file. Turn this off under **Settings → Plugins → HTML Pages**.
 - **Chats** are **Ongoing** or **Temporary**, which archive after a while
   without messages. The model picker beside Send changes the model for that
   chat. Sharing a chat with a channel shares its whole history.

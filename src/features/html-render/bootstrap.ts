@@ -34,7 +34,7 @@ export const HTML_RENDER_LAYOUT_GUIDE = [
   "Buzz adds an 8px html gutter for focus rings and shadows. Use fluid widths.",
   "A box that needs its own background gets 16px padding and var(--radius) corners. Give charts fixed pixel heights.",
   "Let content set the height: don't use vh units or height:100% on html or body.",
-  "Links open in the viewer's browser.",
+  "Links open in the viewer's browser once they confirm.",
 ].join(" ");
 
 const BASE_CSS =
