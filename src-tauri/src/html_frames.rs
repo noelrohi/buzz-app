@@ -29,7 +29,7 @@ impl HtmlFrames {
         if html.len() > MAX_PAGE_BYTES {
             return Err("The page is too large to show".to_owned());
         }
-        let id = hex::encode(Sha256::digest(html.as_bytes()));
+        let id = format!("{:x}", Sha256::digest(html.as_bytes()));
         let mut pages = self.0.lock().map_err(|_| "Pages unavailable")?;
         pages.retain(|(kept, _)| kept != &id);
         pages.push_back((id.clone(), html.into_bytes()));

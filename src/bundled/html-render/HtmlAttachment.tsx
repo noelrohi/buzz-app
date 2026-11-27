@@ -32,9 +32,9 @@ type Load =
  * stays a file card until the viewer chooses to show it. */
 export function HtmlAttachment(props: AttachmentRendererProps) {
   const { attachment, source, placement, FileCard, authorIsAgent } = props;
-  const [shown, setShown] = useState(
-    placement !== "composer" && authorIsAgent === true,
-  );
+  // The author can be identified as an agent after the row mounts.
+  const [chosen, setChosen] = useState(false);
+  const shown = placement !== "composer" && (authorIsAgent === true || chosen);
   const [load, setLoad] = useState<Load>({ state: "idle" });
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export function HtmlAttachment(props: AttachmentRendererProps) {
       ) : (
         placement !== "composer" &&
         !shown && (
-          <Button size="sm" variant="subtle" onClick={() => setShown(true)}>
+          <Button size="sm" variant="subtle" onClick={() => setChosen(true)}>
             Show page
           </Button>
         )

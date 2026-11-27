@@ -7,6 +7,8 @@ const page = `<!doctype html><html><head><style>
 </style></head><body><p id="out">waiting</p><div id="tall"></div><a href="https://example.com/next">Next</a>
 <script>
 document.getElementById("out").textContent = "ran " + getComputedStyle(document.documentElement).getPropertyValue("--foreground").trim();
+// A page may ask on its own; only a click may open a link.
+parent.postMessage({ jsonrpc: "2.0", method: "ui/open-link", params: { url: "https://example.com/unprompted" } }, "*");
 addEventListener("message", () => requestAnimationFrame(() => {
   document.getElementById("out").textContent = "theme " + getComputedStyle(document.documentElement).colorScheme;
 }));
@@ -43,6 +45,20 @@ test("an agent's HTML page runs sandboxed inline and follows the theme; a person
     }),
   ).toBe("blocked");
 
+  const opened = [];
+  browser.context().on("page", (tab) => opened.push(tab.url()));
+  await browser
+    .context()
+    .route("https://example.com/**", (route) =>
+      route.fulfill({ contentType: "text/html", body: "ok" }),
+    );
+  const tab = browser.context().waitForEvent("page");
+  await frame.getByRole("link", { name: "Next" }).click();
+  await expect
+    .poll(async () => (await tab).url())
+    .toBe("https://example.com/next");
+  expect(opened).not.toContain("https://example.com/unprompted");
+
   await browser
     .locator("html")
     .evaluate((element) => (element.dataset.colorMode = "dark"));
@@ -54,4 +70,6 @@ test("an agent's HTML page runs sandboxed inline and follows the theme; a person
   await expect(
     person.frameLocator("iframe[title='Person page']").locator("#out"),
   ).toHaveText(/^ran/);
+  // Its own unprompted request came moments after the Show page click.
+  expect(opened).not.toContain("https://example.com/unprompted");
 });

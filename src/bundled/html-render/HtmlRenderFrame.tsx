@@ -80,8 +80,16 @@ export function HtmlRenderFrame({
         setHeight(next);
         return;
       }
+      // The page can send this unprompted. Only a click in it both focuses
+      // its frame and activates the host; activation alone can come from a
+      // click anywhere in the app moments before.
       const url = readOpenLink(event.data);
-      if (url) openLink.current(url);
+      if (
+        url &&
+        document.activeElement === frame.current &&
+        navigator.userActivation?.isActive
+      )
+        openLink.current(url);
     };
     window.addEventListener("message", receive);
     return () => window.removeEventListener("message", receive);
