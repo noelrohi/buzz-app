@@ -39,6 +39,7 @@ const ROLES: Readonly<Record<string, string>> = {
   "--chart-5": "--text-categorical-purple",
   "--chart-6": "--text-categorical-green",
   "--radius": "--radius-container",
+  "--font-size": "--text-message",
   "--font-sans": "--font-sans",
   "--font-mono": "--font-mono",
 };
@@ -52,6 +53,8 @@ export function hostHtmlTheme(node: Element): HtmlRenderTheme {
     const value = style.getPropertyValue(role).trim();
     if (value) variables[name] = value;
   }
+  // Room for focus rings and shadows at the frame's edge.
+  variables["--page-gutter"] = "8px";
   return {
     appearance:
       node.ownerDocument.documentElement.dataset.colorMode === "light"

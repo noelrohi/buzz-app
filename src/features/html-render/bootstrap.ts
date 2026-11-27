@@ -38,7 +38,7 @@ export const HTML_RENDER_LAYOUT_GUIDE = [
 ].join(" ");
 
 const BASE_CSS =
-  "html{box-sizing:border-box;padding:8px;background:transparent;color:var(--foreground);font-family:var(--font-sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}" +
+  "html{box-sizing:border-box;padding:var(--page-gutter);background:transparent;color:var(--foreground);font-family:var(--font-sans);font-size:var(--font-size);line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}" +
   "*,*::before,*::after{box-sizing:inherit}body{margin:0}code,kbd,pre,samp{font-family:var(--font-mono)}a{color:var(--link)}" +
   ":where(:focus-visible){outline:2px solid var(--ring);outline-offset:-2px}";
 
