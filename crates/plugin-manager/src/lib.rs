@@ -550,6 +550,10 @@ fn bundled_manifests_for(gateway: Option<&gateway::Native>) -> Vec<Manifest> {
         serde_json::from_str(include_str!("../../../src/bundled/charts/manifest.json"))
             .expect("bundled charts manifest"),
         serde_json::from_str(include_str!(
+            "../../../src/bundled/html-render/manifest.json"
+        ))
+        .expect("bundled html render manifest"),
+        serde_json::from_str(include_str!(
             "../../../src/bundled/identity-naming/manifest.json"
         ))
         .expect("identity naming manifest"),
@@ -646,6 +650,7 @@ fn enabled_by_default(id: &str) -> bool {
             | "buzz.feedback"
             | "buzz.diffs"
             | "buzz.mermaid"
+            | "buzz.html-render"
             | "buzz.identity-naming"
             | "buzz.agent-activity"
             | "buzz.terminal"
