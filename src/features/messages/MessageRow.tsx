@@ -857,6 +857,7 @@ function MessageRowContent({
                     source={source}
                     placement="message"
                     message={row}
+                    authorIsAgent={agentAuthor}
                     FileCard={FileAttachment}
                     fallback={fallback}
                   />

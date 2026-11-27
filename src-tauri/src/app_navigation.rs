@@ -39,8 +39,12 @@ fn stays_in_app(url: &Url, development: Option<&Url>) -> bool {
     if !matches!(url.scheme(), "http" | "https") {
         return true;
     }
-    // Windows serves the app from `http(s)://tauri.localhost`.
-    (url.host_str() == Some("tauri.localhost") && url.port().is_none())
+    // Windows serves the app from `http(s)://tauri.localhost`, and inline
+    // HTML pages from `http://buzz-html.localhost` (`html_frames`).
+    (matches!(
+        url.host_str(),
+        Some("tauri.localhost" | "buzz-html.localhost")
+    ) && url.port().is_none())
         || development.is_some_and(|development| development.origin() == url.origin())
 }
 
@@ -55,6 +59,8 @@ mod tests {
             ("tauri://localhost/", None, true),
             ("tauri://localhost/huddle.html", None, true),
             ("http://tauri.localhost/compute-widget.html", None, true),
+            ("http://buzz-html.localhost/ab12", None, true),
+            ("buzz-html://localhost/ab12", None, true),
             ("https://tauri.localhost/", None, true),
             ("http://localhost:1430/channels", Some(&development), true),
             ("about:blank", None, true),
