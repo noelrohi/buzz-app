@@ -97,6 +97,8 @@ export type AttachmentRendererProps = Readonly<{
   source: string;
   placement?: "message" | "composer";
   message?: ChannelMessage | undefined;
+  /** Whether the message's author is an agent, where the host can tell. */
+  authorIsAgent?: boolean | undefined;
   FileCard?: ComponentType<FileCardProps> | undefined;
   onRemove?: (() => void) | undefined;
 }> &

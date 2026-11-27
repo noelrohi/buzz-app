@@ -42,6 +42,7 @@ mod enterprise_auth_build;
 #[cfg(test)]
 mod enterprise_relay_url;
 mod host_command;
+mod html_frames;
 mod host_files;
 mod host_forward;
 mod host_mcp;
@@ -854,6 +855,7 @@ fn commands<R: tauri::Runtime>() -> impl Fn(tauri::ipc::Invoke<R>) -> bool + Sen
         media_lift_subject,
         subject_lift::media_lift_subject_supported,
         clipboard::clipboard_write_text,
+        html_frames::html_frame_put,
         media_stream_base,
         get_os_idle_seconds,
         system_clock::system_hour_cycle,
@@ -1321,6 +1323,8 @@ pub fn run() {
         .manage(saved_downloads::SavedDownloads::default())
         .manage(relay::Uploads::default())
         .register_asynchronous_uri_scheme_protocol("buzz-media", relay::media_protocol)
+        .manage(html_frames::HtmlFrames::default())
+        .register_uri_scheme_protocol("buzz-html", html_frames::protocol)
         .manage(Imports::default())
         .manage(Terminals::default())
         .manage(HostCalls::default())

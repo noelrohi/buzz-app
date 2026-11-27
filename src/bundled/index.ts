@@ -17,6 +17,8 @@ import mermaidManifest from "./mermaid/manifest.json";
 import * as mermaid from "./mermaid";
 import chartsManifest from "./charts/manifest.json";
 import * as charts from "./charts";
+import htmlRenderManifest from "./html-render/manifest.json";
+import * as htmlRender from "./html-render";
 import namingManifest from "./identity-naming/manifest.json";
 import * as naming from "./identity-naming";
 import feedbackManifest from "./feedback/manifest.json";
@@ -143,6 +145,11 @@ export const bundledPlugins: readonly BundledPlugin[] = [
     manifest: { ...chartsManifest, apiVersion: 1 },
     module: charts,
     enabledByDefault: false,
+  },
+  {
+    manifest: { ...htmlRenderManifest, apiVersion: 1 },
+    module: htmlRender,
+    enabledByDefault: true,
   },
   {
     manifest: { ...namingManifest, apiVersion: 1 },
