@@ -84,7 +84,8 @@ export function HtmlRenderFrame({
       // The page can ask unprompted, and nothing it does proves a click, so
       // the viewer confirms with a control the page can't reach.
       const url = readOpenLink(event.data);
-      if (url) setLink(url);
+      // It stays fixed while shown, so the page can't swap what Open opens.
+      if (url) setLink((shown) => shown ?? url);
     };
     window.addEventListener("message", receive);
     return () => window.removeEventListener("message", receive);

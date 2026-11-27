@@ -55,6 +55,10 @@ test("an agent's HTML page runs sandboxed inline and follows the theme; a person
   const confirm = agent.getByRole("group", { name: "Open link" });
   // The page asked on load; nothing opened, and the viewer can still decline.
   await expect(confirm).toContainText("https://example.com/unprompted");
+  // A shown request stays fixed until Open or Cancel.
+  await frame.getByRole("link", { name: "Next" }).click();
+  await expect(confirm).toContainText("https://example.com/unprompted");
+  await confirm.getByRole("button", { name: "Cancel" }).click();
   await frame.getByRole("link", { name: "Next" }).click();
   await expect(confirm).toContainText("https://example.com/next");
   const tab = browser.context().waitForEvent("page");
